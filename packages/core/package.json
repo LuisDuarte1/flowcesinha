@@ -1,0 +1,19 @@
+{
+	"name": "flowcesinha",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"main": "./dist/flowcesinha.cjs",
+	"module": "./dist/flowcesinha.js",
+	"exports": {
+		".": {
+			"import": "./dist/flowcesinha.js",
+			"require": "./dist/flowcesinha.cjs"
+		}
+	},
+	"types": "./dist/flowcesinha.d.ts",
+	"scripts": {
+		"build": "vite build"
+	}
+}

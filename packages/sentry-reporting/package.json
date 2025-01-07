@@ -1,0 +1,23 @@
+{
+	"name": "flowcesinha-sentry",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"main": "./dist/flowcesinha-sentry-reporting.cjs",
+	"module": "./dist/flowcesinha-sentry-reporting.js",
+	"exports": {
+		".": {
+			"import": "./dist/flowcesinha-sentry-reporting.js",
+			"require": "./dist/flowcesinha-sentry-reporting.cjs"
+		}
+	},
+	"types": "./dist/flowcesinha-sentry-reporting.d.ts",
+	"scripts": {
+		"build": "vite build"
+	},
+	"dependencies": {
+		"toucan-js": "^4.0.0",
+		"flowcesinha": "workspace:*"
+	}
+}
