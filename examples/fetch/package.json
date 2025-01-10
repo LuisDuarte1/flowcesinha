@@ -1,5 +1,5 @@
 {
-	"name": "workflows-starter",
+	"name": "flowcesinha-fetch",
 	"version": "0.0.1",
 	"scripts": {
 		"deploy": "wrangler deploy",

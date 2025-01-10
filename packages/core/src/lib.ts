@@ -603,15 +603,19 @@ export class FlowcesinhaContextBase<
 	> {
 		if (typeof configOrCallback === "function") {
 			callback = configOrCallback;
-			configOrCallback = {...defaultStepConfig};
+			configOrCallback = { ...defaultStepConfig };
 		}
 		const maxConcurrency = configOrCallback.maxConcurrency ?? Infinity;
 
 		const stepConfig = {
 			retries: {
-				delay: configOrCallback.retries?.delay ?? defaultStepConfig.retries.delay,
-				limit: configOrCallback.retries?.limit ?? defaultStepConfig.retries.limit,
-				backoff: configOrCallback.retries?.backoff ?? defaultStepConfig.retries.backoff,
+				delay:
+					configOrCallback.retries?.delay ?? defaultStepConfig.retries.delay,
+				limit:
+					configOrCallback.retries?.limit ?? defaultStepConfig.retries.limit,
+				backoff:
+					configOrCallback.retries?.backoff ??
+					defaultStepConfig.retries.backoff,
 			},
 			timeout: configOrCallback.timeout ?? defaultStepConfig.timeout,
 		} satisfies WorkflowStepConfig;
@@ -624,10 +628,12 @@ export class FlowcesinhaContextBase<
 			throw new Error("maxConcurrency must be greater than 0");
 		}
 
-		if(maxConcurrency === Infinity) {
+		if (maxConcurrency === Infinity) {
 			const results = await Promise.all(
-				list.map((item) => this.do(baseName, stepConfig, callback.bind(undefined, item))
-			));
+				list.map((item) =>
+					this.do(baseName, stepConfig, callback.bind(undefined, item)),
+				),
+			);
 			return results as unknown as StorageEngine extends StorageEngineBase
 				? Result<O, StorageEngine>[]
 				: O[];
@@ -637,29 +643,30 @@ export class FlowcesinhaContextBase<
 		const results: unknown[] = [];
 
 		const mapPromise = new Promise((resolve, reject) => {
-			const stepsToRun: (() => Promise<unknown>)[] = list.map((item) => callback.bind(undefined, item));
+			const stepsToRun: (() => Promise<unknown>)[] = list.map((item) =>
+				callback.bind(undefined, item),
+			);
 
 			const runStep = async (step: () => Promise<unknown>) => {
 				this.do(baseName, stepConfig, step as () => Promise<O>)
 					.then((result) => {
 						results.push(result);
 						const maybeStep = stepsToRun.shift();
-						if(maybeStep === undefined) {
-							if(results.length === list.length) {
-								resolve(undefined)
+						if (maybeStep === undefined) {
+							if (results.length === list.length) {
+								resolve(undefined);
 							}
-							return
+							return;
 						}
 						runStep(maybeStep);
 					})
-					.catch(e => reject(e))
-			}
+					.catch((e) => reject(e));
+			};
 
-			stepsToRun.splice(0, maxConcurrency).forEach(step => runStep(step));
-		})
+			stepsToRun.splice(0, maxConcurrency).forEach((step) => runStep(step));
+		});
 
 		await mapPromise;
-
 
 		return results as StorageEngine extends StorageEngineBase
 			? Result<O, StorageEngine>[]

@@ -1,5 +1,5 @@
 import { WorkflowEntrypoint, WorkflowStep, WorkflowEvent } from 'cloudflare:workers';
-import { R2Storage, useFlowcesinha } from 'flowcesinha';
+import { useFlowcesinha } from 'flowcesinha';
 
 type Env = {
 	// Add your bindings here, e.g. Workers KV, D1, Workers AI, etc.
@@ -22,9 +22,7 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
 				event,
 				step,
 				workflowName: this.constructor.name, // equivalent to writing "MyWorkflow"
-				options: {
-					storageEngine: new R2Storage(this.env.WORKFLOWS_BUCKET),
-				},
+				options: {},
 			},
 			async (event, step) => {
 				// test server that 429 4 times, then 200 - see 429.py

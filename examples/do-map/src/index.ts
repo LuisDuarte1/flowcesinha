@@ -1,5 +1,5 @@
 import { WorkflowEntrypoint, WorkflowStep, WorkflowEvent } from 'cloudflare:workers';
-import { R2Storage, useFlowcesinha } from 'flowcesinha';
+import { useFlowcesinha } from 'flowcesinha';
 
 type Env = {
 	// Add your bindings here, e.g. Workers KV, D1, Workers AI, etc.
@@ -22,18 +22,18 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
 				event,
 				step,
 				workflowName: this.constructor.name, // equivalent to writing "MyWorkflow"
-				options: {
-				},
+				options: {},
 			},
 			async (event, step) => {
-				const list = [1,2,3,4,5,6,7,8,9,10]
+				const list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-				const processedList = await step.doMap("traverse list", list, {maxConcurrency: 3}, async (item) => {
-					console.log(`I'm at item ${item}`)
-					await scheduler.wait(1000)
+				// same as `list.map` but each item is processed concurrently in it's own step (and can be controled)
+				const processedList = await step.doMap('traverse list', list, { maxConcurrency: 3 }, async (item) => {
+					console.log(`I'm at item ${item}`);
+					await scheduler.wait(1000);
 
-					return item + 10
-				})
+					return item + 10;
+				});
 
 				console.log(processedList);
 				return 'finished';
