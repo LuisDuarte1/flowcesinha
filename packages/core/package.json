@@ -1,11 +1,16 @@
 {
 	"name": "flowcesinha",
 	"type": "module",
-	"version": "0.0.1",
+	"version": "0.0.4",
 	"private": false,
 	"files": [
 		"dist"
 	],
+	"license": "MIT",
+	"author": {
+		"name": "Luís Duarte",
+		"email": "lduarte@cloudflare.com"
+	},
 	"main": "./dist/flowcesinha.cjs",
 	"module": "./dist/flowcesinha.js",
 	"exports": {
