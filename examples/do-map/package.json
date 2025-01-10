@@ -1,6 +1,7 @@
 {
 	"name": "flowcesinha-do-map",
 	"version": "0.0.1",
+	"private": "true",
 	"scripts": {
 		"deploy": "wrangler deploy",
 		"start": "wrangler dev"

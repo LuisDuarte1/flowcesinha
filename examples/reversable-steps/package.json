@@ -1,5 +1,6 @@
 {
 	"name": "flowcesinha-reversable-steps",
+	"private": "true",
 	"version": "0.0.1",
 	"scripts": {
 		"deploy": "wrangler deploy",

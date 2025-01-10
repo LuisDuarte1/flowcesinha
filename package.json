@@ -10,6 +10,7 @@
 		"check:format": "prettier . --check --cache --ignore-unknown"
 	},
 	"devDependencies": {
+		"@changesets/cli": "^2.27.11",
 		"@cloudflare/workers-types": "4.20241230.0",
 		"@eslint/js": "^9.15.0",
 		"eslint": "^9.15.0",

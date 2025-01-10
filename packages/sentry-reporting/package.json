@@ -1,6 +1,8 @@
 {
 	"name": "flowcesinha-sentry",
 	"type": "module",
+	"version": "0.0.1",
+	"private": false,
 	"files": [
 		"dist"
 	],

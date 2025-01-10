@@ -1,5 +1,6 @@
 {
 	"name": "workflows-starter",
+	"private": "true",
 	"version": "0.0.1",
 	"scripts": {
 		"deploy": "wrangler deploy",
