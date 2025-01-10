@@ -22,7 +22,6 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
 				event,
 				step,
 				workflowName: this.constructor.name, // equivalent to writing "MyWorkflow"
-				options: {},
 			},
 			async (event, step) => {
 				// test server that 429 4 times, then 200 - see 429.py

@@ -22,7 +22,7 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
 				event,
 				step,
 				workflowName: this.constructor.name, // equivalent to writing "MyWorkflow"
-				options: {
+				config: {
 					// Add your custom error reporter here
 					errorReporter: new SentryErrorReporting({
 						context: this.ctx,

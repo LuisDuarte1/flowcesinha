@@ -22,7 +22,6 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
 				event,
 				step,
 				workflowName: this.constructor.name, // equivalent to writing "MyWorkflow"
-				options: {},
 			},
 			async (event, step) => {
 				await step.reversableDo(

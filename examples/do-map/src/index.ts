@@ -22,7 +22,6 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
 				event,
 				step,
 				workflowName: this.constructor.name, // equivalent to writing "MyWorkflow"
-				options: {},
 			},
 			async (event, step) => {
 				const list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];

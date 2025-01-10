@@ -23,7 +23,7 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
 				event,
 				step,
 				workflowName: this.constructor.name, // equivalent to writing "MyWorkflow"
-				options: {
+				config: {
 					// Add your custom storage engine here
 					storageEngine: new R2Storage(this.env.WORKFLOWS_BUCKET),
 				},

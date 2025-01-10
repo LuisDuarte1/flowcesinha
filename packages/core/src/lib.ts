@@ -52,7 +52,7 @@ interface FlowcesinhaContextConstructor<
 	event: WorkflowEvent<Params>;
 	step: WorkflowStep;
 	workflowName: string;
-	options: FlowcesinhaOptions<StorageEngine, ErrorReporter>;
+	config?: FlowcesinhaOptions<StorageEngine, ErrorReporter>;
 }
 
 type Callback<
@@ -122,7 +122,7 @@ export class FlowcesinhaContextBase<
 		this.env = reqs.env;
 		this.event = reqs.event;
 		this.step = reqs.step;
-		this.options = reqs.options;
+		this.options = reqs.config ?? {};
 		this.instanceId = reqs.event.instanceId;
 		this.workflowName = reqs.workflowName;
 	}
