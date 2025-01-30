@@ -70,7 +70,7 @@ interface DurableFetchConfig extends WorkflowStepConfig {
 	/**
 	 * Defaults to true, will checkout the `Retry-After` header and retry the request after the specified time.
 	 */
-	followRetryAfter?: boolean;
+	followRetryAfter?: boolean | ((headers: Headers) => Date);
 }
 
 interface DurableMapConfig extends WorkflowStepConfig {
@@ -497,6 +497,11 @@ export class FlowcesinhaContextBase<
 						}
 						return retryAfterDate;
 					}
+				}
+
+				if (typeof followRetryAfter === "function") {
+					const retryAfterDate = followRetryAfter(response.headers);
+					return retryAfterDate;
 				}
 
 				if (!response.ok) {

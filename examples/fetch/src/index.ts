@@ -25,7 +25,18 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
 			},
 			async (event, step) => {
 				// test server that 429 4 times, then 200 - see 429.py
-				const request = await step.fetch('get example', 'http://localhost:8080');
+				const request = await step.fetch('get example', 'http://localhost:8080', {
+					followRetryAfter: (headers) => {
+						const retryAfter = headers.get('Retry-After');
+						if (retryAfter) {
+							const maybeInt = parseInt(retryAfter, 10);
+							if (!isNaN(maybeInt)) {
+								return new Date(new Date().valueOf() + maybeInt * 1000);
+							}
+						}
+						return new Date();
+					},
+				});
 
 				console.log(request);
 
