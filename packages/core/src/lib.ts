@@ -484,8 +484,9 @@ export class FlowcesinhaContextBase<
 					followRetryAfter &&
 					[429, 503].includes(response.status)
 				) {
-					if (typeof followRetryAfter === "boolean") {
-						const retryAfter = response.headers.get("Retry-After");
+					// Made as function so that we can take an optionally non-spec header name
+					function headerRetry(headerName: string = "Retry-After") {
+						const retryAfter = response.headers.get(headerName);
 						if (retryAfter) {
 							const maybeInt = parseInt(retryAfter, 10);
 							let retryAfterDate: Date;
@@ -497,12 +498,32 @@ export class FlowcesinhaContextBase<
 								retryAfterDate = new Date(retryAfter);
 							}
 							return retryAfterDate;
-						}	
-					} else if (typeof followRetryAfter === "function") {
-						const retryAfterDate = followRetryAfter(response.headers);
-						return retryAfterDate;
+						}
 					}
-					
+
+					if (typeof followRetryAfter === "function") {
+						try {
+							// Run custom user function
+							const retryAfterDate = followRetryAfter(response.headers);
+							// If it doesn't error out, but not return anything, just ignore and move on
+							if (retryAfterDate) return retryAfterDate;
+						} catch (e) {
+							this.options.errorReporter?.reportError(e as Error, {
+								instanceId: this.instanceId,
+								workflowName: this.workflowName,
+								stepName,
+							});
+
+							// Retry parsing header normally
+							const retryAfterDate = headerRetry();
+							if (retryAfterDate) return retryAfterDate;
+						}
+					} else if (typeof followRetryAfter === "boolean") {
+						// Parse header normally
+						const retryAfterDate = headerRetry();
+						// Old code doesn't return if header doesn't exist - carry over
+						if (retryAfterDate) return retryAfterDate;
+					}
 				}
 
 				if (!response.ok) {
