@@ -484,24 +484,25 @@ export class FlowcesinhaContextBase<
 					followRetryAfter &&
 					[429, 503].includes(response.status)
 				) {
-					const retryAfter = response.headers.get("Retry-After");
-					if (retryAfter) {
-						const maybeInt = parseInt(retryAfter, 10);
-						let retryAfterDate: Date;
-						if (!isNaN(maybeInt)) {
-							retryAfterDate = new Date(new Date().valueOf() + maybeInt * 1000);
-						} else {
-							// otherwise, we assume that we it returned the HTTP date format.
-							// FIXME(lduarte): validate the HTTP date format beforing passing to date
-							retryAfterDate = new Date(retryAfter);
-						}
+					if (typeof followRetryAfter === "boolean") {
+						const retryAfter = response.headers.get("Retry-After");
+						if (retryAfter) {
+							const maybeInt = parseInt(retryAfter, 10);
+							let retryAfterDate: Date;
+							if (!isNaN(maybeInt)) {
+								retryAfterDate = new Date(new Date().valueOf() + maybeInt * 1000);
+							} else {
+								// otherwise, we assume that we it returned the HTTP date format.
+								// FIXME(lduarte): validate the HTTP date format beforing passing to date
+								retryAfterDate = new Date(retryAfter);
+							}
+							return retryAfterDate;
+						}	
+					} else if (typeof followRetryAfter === "function") {
+						const retryAfterDate = followRetryAfter(response.headers);
 						return retryAfterDate;
 					}
-				}
-
-				if (typeof followRetryAfter === "function") {
-					const retryAfterDate = followRetryAfter(response.headers);
-					return retryAfterDate;
+					
 				}
 
 				if (!response.ok) {
