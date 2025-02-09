@@ -70,7 +70,7 @@ interface DurableFetchConfig extends WorkflowStepConfig {
 	/**
 	 * Defaults to true, will checkout the `Retry-After` header and retry the request after the specified time.
 	 */
-	followRetryAfter?: boolean | ((headers: Headers) => Date);
+	followRetryAfter?: boolean | string | ((headers: Headers) => Date);
 }
 
 interface DurableMapConfig extends WorkflowStepConfig {
@@ -462,7 +462,7 @@ export class FlowcesinhaContextBase<
 	> {
 		const count = this.#getCount(name);
 		const stepName = `${name}-${count}`;
-		const followRetryAfter = init?.followRetryAfter ?? true;
+		const followRetryAfter = (init?.followRetryAfter) ?? true;
 		const config = {
 			retries: {
 				delay: init?.retries?.delay ?? defaultStepConfig.retries.delay,
@@ -518,6 +518,11 @@ export class FlowcesinhaContextBase<
 							const retryAfterDate = headerRetry();
 							if (retryAfterDate) return retryAfterDate;
 						}
+					} else if (typeof followRetryAfter === "string") {
+						// Parse header normally
+						const retryAfterDate = headerRetry(followRetryAfter);
+						// Old code doesn't return if header doesn't exist - carry over
+						if (retryAfterDate) return retryAfterDate;
 					} else if (typeof followRetryAfter === "boolean") {
 						// Parse header normally
 						const retryAfterDate = headerRetry();
