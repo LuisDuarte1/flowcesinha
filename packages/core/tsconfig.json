@@ -13,7 +13,6 @@
 		"moduleResolution": "bundler",
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
-		"noEmit": true,
 
 		// Best practices
 		"strict": true,
@@ -26,6 +25,7 @@
 		"noPropertyAccessFromIndexSignature": false,
 
 		"declaration": true,
+		"emitDeclarationOnly": true,
 		"declarationDir": "dist/types"
 	},
 	"include": ["src/**/*"]
