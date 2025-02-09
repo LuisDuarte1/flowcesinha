@@ -481,7 +481,7 @@ export class FlowcesinhaContextBase<
 			try {
 				const response = await fetch(input, init);
 				if (
-					followRetryAfter !== false &&
+					followRetryAfter &&
 					[429, 503].includes(response.status)
 				) {
 					const retryAfter = response.headers.get("Retry-After");
