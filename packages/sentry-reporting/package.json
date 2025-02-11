@@ -15,13 +15,13 @@
 	"module": "./dist/flowcesinha-sentry-reporting.js",
 	"exports": {
 		".": {
+			"types": "./dist/types/lib.d.ts",
 			"import": "./dist/flowcesinha-sentry-reporting.js",
 			"require": "./dist/flowcesinha-sentry-reporting.cjs"
 		}
 	},
-	"types": "./dist/flowcesinha-sentry-reporting.d.ts",
 	"scripts": {
-		"build": "vite build"
+		"build": "vite build && tsc -p tsconfig.json"
 	},
 	"dependencies": {
 		"toucan-js": "^4.0.0",
