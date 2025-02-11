@@ -25,7 +25,25 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
 			},
 			async (event, step) => {
 				// test server that 429 4 times, then 200 - see 429.py
-				const request = await step.fetch('get example', 'http://localhost:8080');
+				const request = await step.fetch('get example', 'http://localhost:8080', {
+					followRetryAfter: (headers: Headers) => {
+						const retries: number[] = [];
+						const AzureRetryHeader = new RegExp(/^x-ms-ratelimit-\w+-retry-after$/i);
+
+						for (const [key, value] of headers.entries()) {
+							if (AzureRetryHeader.test(key)) {
+								retries.push(parseInt(value));
+							}
+						}
+
+						const retryAfter: number | undefined = retries.sort((a, b) => a - b)[0];
+						if (retryAfter) {
+							return new Date(new Date().valueOf() + (retryAfter * 1000));
+						} else {
+							throw new Error('No retry-after header found');
+						}
+					},
+				});
 
 				console.log(request);
 

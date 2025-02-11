@@ -70,7 +70,7 @@ interface DurableFetchConfig extends WorkflowStepConfig {
 	/**
 	 * Defaults to true, will checkout the `Retry-After` header and retry the request after the specified time.
 	 */
-	followRetryAfter?: boolean;
+	followRetryAfter?: boolean | string | ((headers: Headers) => Date);
 }
 
 interface DurableMapConfig extends WorkflowStepConfig {
@@ -462,7 +462,7 @@ export class FlowcesinhaContextBase<
 	> {
 		const count = this.#getCount(name);
 		const stepName = `${name}-${count}`;
-		const followRetryAfter = init?.followRetryAfter ?? true;
+		const followRetryAfter = (init?.followRetryAfter) ?? true;
 		const config = {
 			retries: {
 				delay: init?.retries?.delay ?? defaultStepConfig.retries.delay,
@@ -481,21 +481,53 @@ export class FlowcesinhaContextBase<
 			try {
 				const response = await fetch(input, init);
 				if (
-					followRetryAfter !== false &&
+					followRetryAfter &&
 					[429, 503].includes(response.status)
 				) {
-					const retryAfter = response.headers.get("Retry-After");
-					if (retryAfter) {
-						const maybeInt = parseInt(retryAfter, 10);
-						let retryAfterDate: Date;
-						if (!isNaN(maybeInt)) {
-							retryAfterDate = new Date(new Date().valueOf() + maybeInt * 1000);
-						} else {
-							// otherwise, we assume that we it returned the HTTP date format.
-							// FIXME(lduarte): validate the HTTP date format beforing passing to date
-							retryAfterDate = new Date(retryAfter);
+					// Made as function so that we can take an optionally non-spec header name
+					function headerRetry(headerName: string = "Retry-After") {
+						const retryAfter = response.headers.get(headerName);
+						if (retryAfter) {
+							const maybeInt = parseInt(retryAfter, 10);
+							let retryAfterDate: Date;
+							if (!isNaN(maybeInt)) {
+								retryAfterDate = new Date(new Date().valueOf() + maybeInt * 1000);
+							} else {
+								// otherwise, we assume that we it returned the HTTP date format.
+								// FIXME(lduarte): validate the HTTP date format beforing passing to date
+								retryAfterDate = new Date(retryAfter);
+							}
+							return retryAfterDate;
 						}
-						return retryAfterDate;
+					}
+
+					if (typeof followRetryAfter === "function") {
+						try {
+							// Run custom user function
+							const retryAfterDate = followRetryAfter(response.headers);
+							// If it doesn't error out, but not return anything, just ignore and move on
+							if (retryAfterDate) return retryAfterDate;
+						} catch (e) {
+							this.options.errorReporter?.reportError(e as Error, {
+								instanceId: this.instanceId,
+								workflowName: this.workflowName,
+								stepName,
+							});
+
+							// Retry parsing header normally
+							const retryAfterDate = headerRetry();
+							if (retryAfterDate) return retryAfterDate;
+						}
+					} else if (typeof followRetryAfter === "string") {
+						// Parse header normally
+						const retryAfterDate = headerRetry(followRetryAfter);
+						// Old code doesn't return if header doesn't exist - carry over
+						if (retryAfterDate) return retryAfterDate;
+					} else if (typeof followRetryAfter === "boolean") {
+						// Parse header normally
+						const retryAfterDate = headerRetry();
+						// Old code doesn't return if header doesn't exist - carry over
+						if (retryAfterDate) return retryAfterDate;
 					}
 				}
 
