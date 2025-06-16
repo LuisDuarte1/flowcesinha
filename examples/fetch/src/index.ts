@@ -26,10 +26,17 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
 			async (event, step) => {
 				// test server that 429 4 times, then 200 - see 429.py
 				const request = await step.fetch('get example', 'http://localhost:8080');
+				console.log('Response from original fetch:', request);
 
-				console.log(request);
+				// Example of using a string for followRetryAfter to specify a custom header name
+				// This assumes a server at http://localhost:8081 might return a 429
+				// with a header like 'x-custom-retry-duration-seconds: 60'
+				const requestWithStringHeader = await step.fetch('get_example_string_header', 'http://localhost:8081', {
+					followRetryAfter: 'x-custom-retry-duration-seconds'
+				});
+				console.log('Response from fetch with string header:', requestWithStringHeader);
 
-				return 'finished';
+				return 'finished example with string header';
 			},
 		);
 	}
